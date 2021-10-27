@@ -4,3 +4,5 @@
 /build/classes/java/main/
 /.idea/
 /out/
+*.iml
+**/.DS_Store
