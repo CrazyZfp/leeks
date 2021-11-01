@@ -14,7 +14,6 @@ import handler.SinaStockHandler;
 import handler.StockRefreshHandler;
 import handler.TencentStockHandler;
 import org.jetbrains.annotations.Nullable;
-import utils.ConfigUtil;
 import utils.LogUtil;
 import utils.PopupsUiUtil;
 import utils.WindowUtils;
@@ -26,7 +25,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.net.MalformedURLException;
-import java.util.List;
 import java.util.Objects;
 
 public class StockWindow {
