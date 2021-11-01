@@ -6,6 +6,7 @@ import com.intellij.ui.table.JBTable;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import bean.StockBean;
+import utils.ConfigUtil;
 import utils.PinYinUtils;
 import utils.WindowUtils;
 
@@ -15,7 +16,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.util.*;
-import java.util.List;
 
 public abstract class StockRefreshHandler extends DefaultTableModel {
     private static String[] columnNames;
@@ -90,10 +90,8 @@ public abstract class StockRefreshHandler extends DefaultTableModel {
 
     /**
      * 从网络更新数据
-     *
-     * @param code
      */
-    public abstract void handle(List<String> code);
+    public abstract void handle();
 
     /**
      * 设置表格条纹（斑马线）<br>
@@ -109,8 +107,8 @@ public abstract class StockRefreshHandler extends DefaultTableModel {
         }
     }
 
-    public void setupTable(List<String> code) {
-        for (String s : code) {
+    public void setupTable() {
+        for (String s : ConfigUtil.loadStocks()) {
             updateData(new StockBean(s));
         }
     }
@@ -215,8 +213,8 @@ public abstract class StockRefreshHandler extends DefaultTableModel {
         }
         // 与columnNames中的元素保持一致
         Vector<Object> v = new Vector<Object>(columnNames.length);
-        for (int i = 0; i < columnNames.length; i++) {
-            v.addElement(stockBean.getValueByColumn(columnNames[i], colorful));
+        for (String columnName : columnNames) {
+            v.addElement(stockBean.getValueByColumn(columnName, colorful));
         }
         return v;
     }

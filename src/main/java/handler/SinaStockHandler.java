@@ -3,6 +3,7 @@ package handler;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import bean.StockBean;
+import utils.ConfigUtil;
 import utils.HttpClientPool;
 import utils.LogUtil;
 
@@ -11,6 +12,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -22,7 +24,7 @@ public class SinaStockHandler extends StockRefreshHandler {
     private static final Pattern DEFAULT_STOCK_PATTERN = Pattern.compile("var hq_str_(\\w+?)=\"(.*?)\";");
     private final JLabel refreshTimeLabel;
 
-    private static ScheduledExecutorService mSchedulerExecutor = Executors.newSingleThreadScheduledExecutor();
+    private static ScheduledExecutorService mSchedulerExecutor;
 
     public SinaStockHandler(JTable table, JLabel label) {
         super(table);
@@ -30,25 +32,15 @@ public class SinaStockHandler extends StockRefreshHandler {
     }
 
     @Override
-    public void handle(List<String> code) {
-        if (code.isEmpty()) {
-            return;
-        }
-
-        useScheduleThreadExecutor(code);
-    }
-
-    public void useScheduleThreadExecutor(List<String> code) {
-        if (mSchedulerExecutor.isShutdown()){
+    public void handle() {
+        if (Objects.isNull(mSchedulerExecutor) || mSchedulerExecutor.isShutdown()) {
             mSchedulerExecutor = Executors.newSingleThreadScheduledExecutor();
+            mSchedulerExecutor.scheduleAtFixedRate(getWork(), 0, threadSleepTime, TimeUnit.SECONDS);
         }
-        mSchedulerExecutor.scheduleAtFixedRate(getWork(code), 0, threadSleepTime, TimeUnit.SECONDS);
     }
 
-    private Runnable getWork(List<String> code) {
-        return () -> {
-            pollStock(code);
-        };
+    private Runnable getWork() {
+        return () -> pollStock(ConfigUtil.loadStocks());
     }
 
     private void pollStock(List<String> code) {

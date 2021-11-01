@@ -71,7 +71,7 @@ public class SettingsWindow  implements Configurable {
     }
 
     @Override
-    public void apply() throws ConfigurationException {
+    public void apply() {
         PropertiesComponent instance = PropertiesComponent.getInstance();
         instance.setValue("key_funds", textAreaFund.getText());
         instance.setValue("key_stocks", textAreaStock.getText());

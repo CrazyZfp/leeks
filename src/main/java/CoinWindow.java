@@ -8,6 +8,7 @@ import com.intellij.ui.table.JBTable;
 import handler.CoinRefreshHandler;
 import handler.SinaCoinHandler;
 import org.jetbrains.annotations.NotNull;
+import utils.ConfigUtil;
 import utils.WindowUtils;
 
 import javax.swing.*;
@@ -91,20 +92,18 @@ public class CoinWindow {
             handler.setThreadSleepTime(instance.getInt("key_coin_thread_time", handler.getThreadSleepTime()));
             handler.refreshColorful(instance.getBoolean("key_colorful"));
             handler.clearRow();
-            handler.setupTable(loadCoins());
-            handler.handle(loadCoins());
+            handler.setupTable(ConfigUtil.loadCoins());
+            handler.handle(ConfigUtil.loadCoins());
         }
     }
     public static void refresh() {
         if (handler != null) {
             boolean colorful = PropertiesComponent.getInstance().getBoolean("key_colorful");
             handler.refreshColorful(colorful);
-            handler.handle(loadCoins());
+            handler.handle(ConfigUtil.loadCoins());
         }
     }
 
-    private static List<String> loadCoins(){
-        return FundWindow.getConfigList("key_coins", "[,，]");
-    }
+
 
 }

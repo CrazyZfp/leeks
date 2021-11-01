@@ -2,6 +2,7 @@ package handler;
 
 import org.apache.commons.lang.StringUtils;
 import bean.StockBean;
+import utils.ConfigUtil;
 import utils.HttpClientPool;
 import utils.LogUtil;
 
@@ -22,32 +23,31 @@ public class TencentStockHandler extends StockRefreshHandler {
     }
 
     @Override
-    public void handle(List<String> code) {
+    public void handle() {
 
-        if (worker!=null){
+        List<String> codes = ConfigUtil.loadStocks();
+
+        if (worker != null) {
             worker.interrupt();
         }
         LogUtil.info("Leeks 更新Stock编码数据.");
 //        clearRow();
-        if (code.isEmpty()){
+        if (codes.isEmpty()) {
             return;
         }
-        worker = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (worker!=null && worker.hashCode() == Thread.currentThread().hashCode() && !worker.isInterrupted()){
-                    stepAction();
-                    try {
-                        Thread.sleep(threadSleepTime * 1000);
-                    } catch (InterruptedException e) {
-                        LogUtil.info("Leeks 已停止更新Stock编码数据.");
-                        refreshTimeLabel.setText("stop");
-                        return;
-                    }
+        worker = new Thread(() -> {
+            while (worker != null && worker.hashCode() == Thread.currentThread().hashCode() && !worker.isInterrupted()) {
+                stepAction();
+                try {
+                    Thread.sleep(threadSleepTime * 1000);
+                } catch (InterruptedException e) {
+                    LogUtil.info("Leeks 已停止更新Stock编码数据.");
+                    refreshTimeLabel.setText("stop");
+                    return;
                 }
             }
         });
-        urlPara = String.join(",", code);
+        urlPara = String.join(",", codes);
         worker.start();
 
     }
@@ -70,11 +70,11 @@ public class TencentStockHandler extends StockRefreshHandler {
 //            }
 //            return;
 //        }
-        if (StringUtils.isEmpty(urlPara)){
+        if (StringUtils.isEmpty(urlPara)) {
             return;
         }
         try {
-            String result = HttpClientPool.getHttpClient().get("http://qt.gtimg.cn/q="+urlPara);
+            String result = HttpClientPool.getHttpClient().get("http://qt.gtimg.cn/q=" + urlPara);
             parse(result);
             updateUI();
         } catch (Exception e) {
@@ -85,8 +85,8 @@ public class TencentStockHandler extends StockRefreshHandler {
     private void parse(String result) {
         String[] lines = result.split("\n");
         for (String line : lines) {
-            String code = line.substring(line.indexOf("_")+1,line.indexOf("="));
-            String dataStr = line.substring(line.indexOf("=")+2,line.length()-2);
+            String code = line.substring(line.indexOf("_") + 1, line.indexOf("="));
+            String dataStr = line.substring(line.indexOf("=") + 2, line.length() - 2);
             String[] values = dataStr.split("~");
             StockBean bean = new StockBean(code);
             bean.setName(values[1]);

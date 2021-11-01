@@ -18,11 +18,8 @@ import com.intellij.ui.table.JBTable;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import utils.HttpClientPool;
-import utils.LogUtil;
+import utils.*;
 import handler.TianTianFundHandler;
-import utils.PopupsUiUtil;
-import utils.WindowUtils;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -166,24 +163,6 @@ public class FundWindow implements ToolWindowFactory {
         apply();
     }
 
-    private static List<String> loadFunds() {
-        return getConfigList("key_funds", "[,，]");
-    }
-
-    public static List<String> getConfigList(String key, String split) {
-        String value = PropertiesComponent.getInstance().getValue(key);
-        if (StringUtils.isEmpty(value)) {
-            return new ArrayList<>();
-        }
-        Set<String> set = new LinkedHashSet<>();
-        String[] codes = value.split(split);
-        for (String code : codes) {
-            if (!code.isEmpty()) {
-                set.add(code.trim());
-            }
-        }
-        return new ArrayList<>(set);
-    }
 
 
     @Override
@@ -203,8 +182,8 @@ public class FundWindow implements ToolWindowFactory {
             fundRefreshHandler.setThreadSleepTime(instance.getInt("key_funds_thread_time", fundRefreshHandler.getThreadSleepTime()));
             fundRefreshHandler.refreshColorful(instance.getBoolean("key_colorful"));
             fundRefreshHandler.clearRow();
-            fundRefreshHandler.setupTable(loadFunds());
-            fundRefreshHandler.handle(loadFunds());
+            fundRefreshHandler.setupTable(ConfigUtil.loadFunds());
+            fundRefreshHandler.handle(ConfigUtil.loadFunds());
         }
     }
 
@@ -212,7 +191,7 @@ public class FundWindow implements ToolWindowFactory {
         if (fundRefreshHandler != null) {
             boolean colorful = PropertiesComponent.getInstance().getBoolean("key_colorful");
             fundRefreshHandler.refreshColorful(colorful);
-            fundRefreshHandler.handle(loadFunds());
+            fundRefreshHandler.handle(ConfigUtil.loadFunds());
         }
     }
 }

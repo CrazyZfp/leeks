@@ -14,6 +14,7 @@ import handler.SinaStockHandler;
 import handler.StockRefreshHandler;
 import handler.TencentStockHandler;
 import org.jetbrains.annotations.Nullable;
+import utils.ConfigUtil;
 import utils.LogUtil;
 import utils.PopupsUiUtil;
 import utils.WindowUtils;
@@ -26,6 +27,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.net.MalformedURLException;
 import java.util.List;
+import java.util.Objects;
 
 public class StockWindow {
     private JPanel mPanel;
@@ -124,30 +126,24 @@ public class StockWindow {
                 .setToolbarPosition(ActionToolbarPosition.TOP);
         JPanel toolPanel = toolbarDecorator.createPanel();
         toolbarDecorator.getActionsPanel().add(refreshTimeLabel, BorderLayout.EAST);
-        toolPanel.setBorder(new EmptyBorder(0,0,0,0));
+        toolPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
         mPanel.add(toolPanel, BorderLayout.CENTER);
         // 非主要tab，需要创建，创建时立即应用数据
         apply();
     }
 
-    private static StockRefreshHandler factoryHandler(){
-        boolean useSinaApi = PropertiesComponent.getInstance().getBoolean("key_stocks_sina");
-        if (useSinaApi){
-            if (handler instanceof SinaStockHandler){
-                return handler;
-            }
-            if (handler!=null){
-                handler.stopHandle();
-            }
-            return new SinaStockHandler(table, refreshTimeLabel);
-        }
-        if (handler instanceof TencentStockHandler){
-            return handler;
-        }
-        if (handler!=null){
+    private static StockRefreshHandler factoryHandler() {
+
+        if (Objects.nonNull(handler)) {
             handler.stopHandle();
         }
-        return  new TencentStockHandler(table, refreshTimeLabel);
+
+        boolean useSinaApi = PropertiesComponent.getInstance().getBoolean("key_stocks_sina");
+
+        if (useSinaApi) {
+            return new SinaStockHandler(table, refreshTimeLabel);
+        }
+        return new TencentStockHandler(table, refreshTimeLabel);
     }
 
     public static void apply() {
@@ -158,20 +154,16 @@ public class StockWindow {
             handler.setThreadSleepTime(instance.getInt("key_stocks_thread_time", handler.getThreadSleepTime()));
             handler.refreshColorful(instance.getBoolean("key_colorful"));
             handler.clearRow();
-            handler.setupTable(loadStocks());
-            handler.handle(loadStocks());
+            handler.setupTable();
+            handler.handle();
         }
     }
+
     public static void refresh() {
         if (handler != null) {
             boolean colorful = PropertiesComponent.getInstance().getBoolean("key_colorful");
             handler.refreshColorful(colorful);
-            handler.handle(loadStocks());
+            handler.handle();
         }
     }
-
-    private static List<String> loadStocks(){
-        return FundWindow.getConfigList("key_stocks", "[,，]");
-    }
-
 }
