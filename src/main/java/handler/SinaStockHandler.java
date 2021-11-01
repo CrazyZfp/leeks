@@ -93,7 +93,9 @@ public class SinaStockHandler extends StockRefreshHandler {
 
     @Override
     public void stopHandle() {
-        mSchedulerExecutor.shutdown();
+        if(Objects.nonNull(mSchedulerExecutor)){
+            mSchedulerExecutor.shutdown();
+        }
         LogUtil.info("leeks stock 自动刷新关闭!");
     }
 }
