@@ -6,6 +6,7 @@ import bean.StockBean;
 import utils.ConfigUtil;
 import utils.HttpClientPool;
 import utils.LogUtil;
+import utils.ThreadPoolUtil;
 
 import javax.swing.*;
 import java.math.BigDecimal;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,6 +39,12 @@ public class SinaStockHandler extends StockRefreshHandler {
             mSchedulerExecutor = Executors.newSingleThreadScheduledExecutor();
             mSchedulerExecutor.scheduleAtFixedRate(getWork(), 0, threadSleepTime, TimeUnit.SECONDS);
         }
+    }
+
+    @Override
+    public void refreshNow() {
+        ThreadPoolUtil.execute(getWork());
+        this.handle();
     }
 
     private Runnable getWork() {
@@ -93,7 +101,7 @@ public class SinaStockHandler extends StockRefreshHandler {
 
     @Override
     public void stopHandle() {
-        if(Objects.nonNull(mSchedulerExecutor)){
+        if (Objects.nonNull(mSchedulerExecutor)) {
             mSchedulerExecutor.shutdown();
         }
         LogUtil.info("leeks stock 自动刷新关闭!");

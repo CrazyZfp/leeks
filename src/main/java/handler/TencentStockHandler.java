@@ -53,6 +53,11 @@ public class TencentStockHandler extends StockRefreshHandler {
     }
 
     @Override
+    public void refreshNow() {
+
+    }
+
+    @Override
     public void stopHandle() {
         if (worker != null) {
             worker.interrupt();

@@ -6,6 +6,7 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.PopupStep;
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep;
 import com.intellij.ui.AnActionButton;
+import com.intellij.ui.IconManager;
 import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.table.JBTable;
@@ -106,10 +107,19 @@ public class StockWindow {
         handler = factoryHandler();
 
         AnActionButton refreshAction = new AnActionButton("停止刷新当前表格数据", AllIcons.Actions.Pause) {
+            int flag = 1;
+
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
-                handler.stopHandle();
-                this.setEnabled(false);
+                if (flag == 1) {
+                    handler.stopHandle();
+                    this.getTemplatePresentation().setIcon(AllIcons.Toolwindows.ToolWindowRun);
+                    flag = 0;
+                } else {
+                    handler.handle();
+                    this.getTemplatePresentation().setIcon(AllIcons.Actions.Pause);
+                    flag = 1;
+                }
             }
         };
         ToolbarDecorator toolbarDecorator = ToolbarDecorator.createDecorator(table)
@@ -161,7 +171,7 @@ public class StockWindow {
         if (handler != null) {
             boolean colorful = PropertiesComponent.getInstance().getBoolean("key_colorful");
             handler.refreshColorful(colorful);
-            handler.handle();
+            handler.refreshNow();
         }
     }
 }

@@ -93,6 +93,7 @@ public abstract class StockRefreshHandler extends DefaultTableModel {
      */
     public abstract void handle();
 
+    public abstract void refreshNow();
     /**
      * 设置表格条纹（斑马线）<br>
      *
