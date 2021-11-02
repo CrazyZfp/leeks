@@ -106,32 +106,36 @@ public class StockWindow {
         //切换接口
         handler = factoryHandler();
 
-        AnActionButton refreshAction = new AnActionButton("停止刷新当前表格数据", AllIcons.Actions.Pause) {
+        AnActionButton refreshAction = new AnActionButton("停止定时刷新", AllIcons.Actions.Pause) {
             int flag = 1;
 
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
                 if (flag == 1) {
                     handler.stopHandle();
-                    this.getTemplatePresentation().setIcon(AllIcons.Toolwindows.ToolWindowRun);
+                    e.getPresentation().setIcon(AllIcons.Toolwindows.ToolWindowRun);
+                    e.getPresentation().setText("开启定时刷新");
+                    this.updateButton(e);
                     flag = 0;
                 } else {
                     handler.handle();
-                    this.getTemplatePresentation().setIcon(AllIcons.Actions.Pause);
+                    e.getPresentation().setIcon(AllIcons.Actions.Pause);
+                    e.getPresentation().setText("停止定时刷新");
                     flag = 1;
+                    this.updateButton(e);
                 }
             }
         };
         ToolbarDecorator toolbarDecorator = ToolbarDecorator.createDecorator(table)
-                .addExtraAction(new AnActionButton("持续刷新当前表格数据", AllIcons.Actions.Refresh) {
+                .addExtraAction(new AnActionButton("立即刷新", AllIcons.Actions.Refresh) {
                     @Override
                     public void actionPerformed(@NotNull AnActionEvent e) {
                         refresh();
-                        refreshAction.setEnabled(true);
                     }
                 })
                 .addExtraAction(refreshAction)
                 .setToolbarPosition(ActionToolbarPosition.TOP);
+
         JPanel toolPanel = toolbarDecorator.createPanel();
         toolbarDecorator.getActionsPanel().add(refreshTimeLabel, BorderLayout.EAST);
         toolPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
