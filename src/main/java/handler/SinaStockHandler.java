@@ -3,6 +3,7 @@ package handler;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import bean.StockBean;
+import com.intellij.ui.table.JBTable;
 import utils.ConfigUtil;
 import utils.HttpClientPool;
 import utils.LogUtil;
@@ -22,13 +23,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SinaStockHandler extends StockRefreshHandler {
-    private static final String URL = "http://hq.sinajs.cn/list=";
+    private static final String URL = "https://hq.sinajs.cn/list=";
     private static final Pattern DEFAULT_STOCK_PATTERN = Pattern.compile("var hq_str_(\\w+?)=\"(.*?)\";");
     private final JLabel refreshTimeLabel;
 
     private static ScheduledExecutorService mSchedulerExecutor;
 
-    public SinaStockHandler(JTable table, JLabel label) {
+    public SinaStockHandler(JBTable table, JLabel label) {
         super(table);
         this.refreshTimeLabel = label;
     }

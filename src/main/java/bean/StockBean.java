@@ -1,6 +1,7 @@
 package bean;
 
 import utils.PinYinUtils;
+import utils.WindowUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -110,35 +111,36 @@ public class StockBean {
 
     /**
      * 返回列名的VALUE 用作展示
-     * @param colums 字段名
+     *
+     * @param header   字段名
      * @param colorful 隐蔽模式
      * @return 对应列名的VALUE值 无法匹配返回""
      */
-    public String getValueByColumn(String colums, boolean colorful) {
-        switch (colums) {
-            case "编码":
+    public String getValueByColumn(WindowUtils.StockTableHeaders header, boolean colorful) {
+        switch (header) {
+            case STOCK_CODE:
                 return this.getCode();
-            case "股票名称":
+            case STOCK_NAME:
                 return colorful ? this.getName() : PinYinUtils.toPinYin(this.getName());
-            case "当前价":
+            case STOCK_PRICE:
                 return this.getNow();
-            case "涨跌":
+            case STOCK_INCREASING:
                 String changeStr = "--";
                 if (this.getChange() != null) {
                     changeStr = this.getChange().startsWith("-") ? this.getChange() : "+" + this.getChange();
                 }
                 return changeStr;
-            case "涨跌幅":
+            case STOCK_INCREASING_PERCENT:
                 String changePercentStr = "--";
                 if (this.getChangePercent() != null) {
                     changePercentStr = this.getChangePercent().startsWith("-") ? this.getChangePercent() : "+" + this.getChangePercent();
                 }
                 return changePercentStr + "%";
-            case "最高价":
+            case STOCK_HIGHEST:
                 return this.getMax();
-            case "最低价":
-                return this.getMin() ;
-            case "更新时间":
+            case STOCK_LOWEST:
+                return this.getMin();
+            case UPDATE_TIME:
                 String timeStr = "--";
                 if (this.getTime() != null) {
                     timeStr = this.getTime().substring(8);
@@ -146,7 +148,6 @@ public class StockBean {
                 return timeStr;
             default:
                 return "";
-
         }
     }
 }

@@ -1,5 +1,6 @@
 package handler;
 
+import com.intellij.ui.table.JBTable;
 import org.apache.commons.lang.StringUtils;
 import bean.StockBean;
 import utils.ConfigUtil;
@@ -17,7 +18,7 @@ public class TencentStockHandler extends StockRefreshHandler {
     private JLabel refreshTimeLabel;
 
 
-    public TencentStockHandler(JTable table1, JLabel refreshTimeLabel) {
+    public TencentStockHandler(JBTable table1, JLabel refreshTimeLabel) {
         super(table1);
         this.refreshTimeLabel = refreshTimeLabel;
     }
@@ -79,7 +80,7 @@ public class TencentStockHandler extends StockRefreshHandler {
             return;
         }
         try {
-            String result = HttpClientPool.getHttpClient().get("http://qt.gtimg.cn/q=" + urlPara);
+            String result = HttpClientPool.getHttpClient().get("https://qt.gtimg.cn/q=" + urlPara);
             parse(result);
             updateUI();
         } catch (Exception e) {

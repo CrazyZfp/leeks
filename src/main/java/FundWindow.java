@@ -29,6 +29,8 @@ import java.net.MalformedURLException;
 import java.util.*;
 import java.util.List;
 
+import static constants.Constants.KEY_COLORFUL;
+
 public class FundWindow implements ToolWindowFactory {
     private JPanel mPanel;
 
@@ -180,7 +182,7 @@ public class FundWindow implements ToolWindowFactory {
             PropertiesComponent instance = PropertiesComponent.getInstance();
             fundRefreshHandler.setStriped(instance.getBoolean("key_table_striped"));
             fundRefreshHandler.setThreadSleepTime(instance.getInt("key_funds_thread_time", fundRefreshHandler.getThreadSleepTime()));
-            fundRefreshHandler.refreshColorful(instance.getBoolean("key_colorful"));
+            fundRefreshHandler.refreshColorful(instance.getBoolean(KEY_COLORFUL));
             fundRefreshHandler.clearRow();
             fundRefreshHandler.setupTable(ConfigUtil.loadFunds());
             fundRefreshHandler.handle(ConfigUtil.loadFunds());
@@ -189,7 +191,7 @@ public class FundWindow implements ToolWindowFactory {
 
     public static void refresh() {
         if (fundRefreshHandler != null) {
-            boolean colorful = PropertiesComponent.getInstance().getBoolean("key_colorful");
+            boolean colorful = PropertiesComponent.getInstance().getBoolean(KEY_COLORFUL);
             fundRefreshHandler.refreshColorful(colorful);
             fundRefreshHandler.handle(ConfigUtil.loadFunds());
         }

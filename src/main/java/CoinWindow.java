@@ -18,6 +18,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.util.List;
 
+import static constants.Constants.KEY_COLORFUL;
+
 public class CoinWindow {
     private JPanel mPanel;
 
@@ -90,7 +92,7 @@ public class CoinWindow {
             PropertiesComponent instance = PropertiesComponent.getInstance();
             handler.setStriped(instance.getBoolean("key_table_striped"));
             handler.setThreadSleepTime(instance.getInt("key_coin_thread_time", handler.getThreadSleepTime()));
-            handler.refreshColorful(instance.getBoolean("key_colorful"));
+            handler.refreshColorful(instance.getBoolean(KEY_COLORFUL));
             handler.clearRow();
             handler.setupTable(ConfigUtil.loadCoins());
             handler.handle(ConfigUtil.loadCoins());
@@ -98,7 +100,7 @@ public class CoinWindow {
     }
     public static void refresh() {
         if (handler != null) {
-            boolean colorful = PropertiesComponent.getInstance().getBoolean("key_colorful");
+            boolean colorful = PropertiesComponent.getInstance().getBoolean(KEY_COLORFUL);
             handler.refreshColorful(colorful);
             handler.handle(ConfigUtil.loadCoins());
         }

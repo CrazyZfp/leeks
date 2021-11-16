@@ -6,7 +6,6 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.PopupStep;
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep;
 import com.intellij.ui.AnActionButton;
-import com.intellij.ui.IconManager;
 import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.table.JBTable;
@@ -15,18 +14,24 @@ import handler.SinaStockHandler;
 import handler.StockRefreshHandler;
 import handler.TencentStockHandler;
 import org.jetbrains.annotations.Nullable;
+import render.OperationTableCellRender;
 import utils.LogUtil;
 import utils.PopupsUiUtil;
 import utils.WindowUtils;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.net.MalformedURLException;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static constants.Constants.KEY_COLORFUL;
 
 public class StockWindow {
     private JPanel mPanel;
@@ -49,24 +54,32 @@ public class StockWindow {
         table.getTableHeader().addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                StringBuilder tableHeadChange = new StringBuilder();
-                for (int i = 0; i < table.getColumnCount(); i++) {
-                    tableHeadChange.append(table.getColumnName(i)).append(",");
-                }
+
+                String tableHeadChange = Stream.iterate(0, i -> i + 1)
+                        .limit(table.getColumnCount())
+                        .map(table::getColumnName)
+                        .collect(Collectors.joining(","));
+
                 PropertiesComponent instance = PropertiesComponent.getInstance();
                 //将列名的修改放入环境中 key:stock_table_header_key
-                instance.setValue(WindowUtils.STOCK_TABLE_HEADER_KEY, tableHeadChange
-                        .substring(0, tableHeadChange.length() > 0 ? tableHeadChange.length() - 1 : 0));
-
+                instance.setValue(WindowUtils.STOCK_TABLE_HEADER_KEY, tableHeadChange);
                 //LogUtil.info(instance.getValue(WindowUtils.STOCK_TABLE_HEADER_KEY));
             }
 
         });
+
         table.addMouseListener(new MouseAdapter() {
+
             @Override
-            public void mousePressed(MouseEvent e) {
-                if (table.getSelectedRow() < 0)
+            public void mouseClicked(MouseEvent e) {
+                if (table.getSelectedRow() < 0) {
                     return;
+                }
+                TableColumn column = table.getColumnModel().getColumn(table.getSelectedColumn());
+                if (column.getCellRenderer() instanceof OperationTableCellRender) {
+                    ((OperationTableCellRender) column.getCellRenderer()).dispatchEvent(e);
+                    return;
+                }
                 String code = String.valueOf(table.getModel().getValueAt(table.convertRowIndexToModel(table.getSelectedRow()), handler.codeColumnIndex));//FIX 移动列导致的BUG
                 if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() > 1) {
                     // 鼠标左键双击
@@ -106,7 +119,7 @@ public class StockWindow {
         //切换接口
         handler = factoryHandler();
 
-        AnActionButton refreshAction = new AnActionButton("停止定时刷新", AllIcons.Actions.Pause) {
+        AnActionButton suspendBtn = new AnActionButton("停止定时刷新", AllIcons.Actions.Pause) {
             int flag = 1;
 
             @Override
@@ -126,14 +139,17 @@ public class StockWindow {
                 }
             }
         };
+
+        AnActionButton refreshBtn = new AnActionButton("立即刷新", AllIcons.Actions.Refresh) {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent e) {
+                refresh();
+            }
+        };
+
         ToolbarDecorator toolbarDecorator = ToolbarDecorator.createDecorator(table)
-                .addExtraAction(new AnActionButton("立即刷新", AllIcons.Actions.Refresh) {
-                    @Override
-                    public void actionPerformed(@NotNull AnActionEvent e) {
-                        refresh();
-                    }
-                })
-                .addExtraAction(refreshAction)
+                .addExtraAction(refreshBtn)
+                .addExtraAction(suspendBtn)
                 .setToolbarPosition(ActionToolbarPosition.TOP);
 
         JPanel toolPanel = toolbarDecorator.createPanel();
@@ -164,7 +180,7 @@ public class StockWindow {
             PropertiesComponent instance = PropertiesComponent.getInstance();
             handler.setStriped(instance.getBoolean("key_table_striped"));
             handler.setThreadSleepTime(instance.getInt("key_stocks_thread_time", handler.getThreadSleepTime()));
-            handler.refreshColorful(instance.getBoolean("key_colorful"));
+            handler.refreshColorful(instance.getBoolean(KEY_COLORFUL));
             handler.clearRow();
             handler.setupTable();
             handler.handle();
@@ -173,7 +189,7 @@ public class StockWindow {
 
     public static void refresh() {
         if (handler != null) {
-            boolean colorful = PropertiesComponent.getInstance().getBoolean("key_colorful");
+            boolean colorful = PropertiesComponent.getInstance().getBoolean(KEY_COLORFUL);
             handler.refreshColorful(colorful);
             handler.refreshNow();
         }

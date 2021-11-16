@@ -1,27 +1,22 @@
 package utils;
 
 import com.intellij.ide.util.PropertiesComponent;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static constants.Constants.KEY_STOCKS;
 
 public class ConfigUtil {
     private static List<String> getCodes(String key) {
-        String value = PropertiesComponent.getInstance().getValue(key);
-        if (StringUtils.isEmpty(value)) {
+        String[] values = PropertiesComponent.getInstance().getValues(key);
+        if (ArrayUtils.isEmpty(values)) {
             return new ArrayList<>();
         }
-        Set<String> set = new LinkedHashSet<>();
-        String[] codes = value.split("[,，]");
-        for (String code : codes) {
-            if (!code.isEmpty()) {
-                set.add(code.trim());
-            }
-        }
-        return new ArrayList<>(set);
+
+        return Arrays.stream(values).collect(Collectors.toList());
     }
 
     public static List<String> loadCoins() {
@@ -33,6 +28,12 @@ public class ConfigUtil {
     }
 
     public static List<String> loadStocks() {
-        return ConfigUtil.getCodes("key_stocks");
+        return ConfigUtil.getCodes(KEY_STOCKS);
+    }
+
+    public static void removeStocks(String... codes) {
+        List<String> stocks = loadStocks();
+        stocks.removeIf(code -> ArrayUtils.contains(codes, code));
+        PropertiesComponent.getInstance().setValues(KEY_STOCKS, stocks.toArray(new String[0]));
     }
 }
