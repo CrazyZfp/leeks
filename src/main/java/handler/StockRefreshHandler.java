@@ -33,10 +33,20 @@ public abstract class StockRefreshHandler extends DefaultTableModel {
     static {
         PropertiesComponent instance = PropertiesComponent.getInstance();
         String[] headers = instance.getValues(WindowUtils.STOCK_TABLE_HEADER_KEY);
+        String[] allValidHeaders = Arrays.stream(StockTableHeaders.values()).map(StockTableHeaders::getCnName).toArray(String[]::new);
+
         if (ArrayUtils.isEmpty(headers)) {
-            headers = Arrays.stream(StockTableHeaders.values()).map(StockTableHeaders::getCnName).toArray(String[]::new);
-            instance.setValues(WindowUtils.STOCK_TABLE_HEADER_KEY, headers);
+            headers = allValidHeaders;
+            instance.setValues(WindowUtils.STOCK_TABLE_HEADER_KEY, allValidHeaders);
+        } else {
+            for (String header : headers) {
+                if (!ArrayUtils.contains(allValidHeaders, header)) {
+                    headers = allValidHeaders;
+                    instance.setValues(WindowUtils.STOCK_TABLE_HEADER_KEY, allValidHeaders);
+                }
+            }
         }
+
         COLUMNS = headers;
     }
 
