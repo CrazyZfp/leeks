@@ -1,5 +1,6 @@
 package utils;
 
+import org.apache.commons.lang3.StringUtils;
 import render.OperationTableCellRender;
 import render.StockDataTableCellRender;
 
@@ -20,6 +21,7 @@ public class WindowUtils {
     public static final String STOCK_TABLE_HEADER_KEY = "stock_table_header_key";
     public static final String STOCK_TABLE_HEADER_VALUE = "编码,股票名称,当前价,涨跌,涨跌幅,最高价,最低价,更新时间,操作";
 
+
     public enum StockTableHeaders {
         STOCK_CODE("编码", StockDataTableCellRender::new),
         STOCK_NAME("名称", StockDataTableCellRender::new),
@@ -31,19 +33,28 @@ public class WindowUtils {
         UPDATE_TIME("更新时间", StockDataTableCellRender::new),
         OPERATION("操作", OperationTableCellRender::new);
 
-        private final String displayName;
+        private final String cnName;
         private final Supplier<TableCellRenderer> renderSupplier;
 
-        StockTableHeaders(String displayName, Supplier<TableCellRenderer> renderSupplier) {
-            this.displayName = displayName;
+        StockTableHeaders(String cnName, Supplier<TableCellRenderer> renderSupplier) {
+            this.cnName = cnName;
             this.renderSupplier = renderSupplier;
         }
 
-        public String getDisplayName() {
-            return displayName;
+        public String getCnName() {
+            return this.cnName;
         }
 
-        public TableCellRenderer getRenderInstance() {
+        public static StockTableHeaders of(String cnName) {
+            for (StockTableHeaders header : StockTableHeaders.values()) {
+                if (StringUtils.equals(cnName, header.getCnName())) {
+                    return header;
+                }
+            }
+            return STOCK_CODE;
+        }
+
+        public TableCellRenderer getRenderInstance(){
             return this.renderSupplier.get();
         }
     }

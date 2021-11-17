@@ -16,13 +16,12 @@ import utils.WindowUtils.StockTableHeaders;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.util.*;
 
 public abstract class StockRefreshHandler extends DefaultTableModel {
-    private static StockTableHeaders[] COLUMNS;
+    private static String[] COLUMNS;
     /**
      * 存放【编码】的位置，更新数据时用到
      */
@@ -35,10 +34,10 @@ public abstract class StockRefreshHandler extends DefaultTableModel {
         PropertiesComponent instance = PropertiesComponent.getInstance();
         String[] headers = instance.getValues(WindowUtils.STOCK_TABLE_HEADER_KEY);
         if (ArrayUtils.isEmpty(headers)) {
-            headers = Arrays.stream(StockTableHeaders.values()).map(StockTableHeaders::name).toArray(String[]::new);
+            headers = Arrays.stream(StockTableHeaders.values()).map(StockTableHeaders::getCnName).toArray(String[]::new);
             instance.setValues(WindowUtils.STOCK_TABLE_HEADER_KEY, headers);
         }
-        COLUMNS = Arrays.stream(headers).map(StockTableHeaders::valueOf).toArray(StockTableHeaders[]::new);
+        COLUMNS = headers;
     }
 
 
@@ -65,11 +64,7 @@ public abstract class StockRefreshHandler extends DefaultTableModel {
         setColumnIdentifiers(COLUMNS);
 
         // 刷新表头
-        this.table.getColumn(StockTableHeaders.OPERATION).setCellRenderer(new OperationTableCellRender());
-        for (StockTableHeaders h : StockTableHeaders.values()) {
-            this.table.getColumn(h).setCellRenderer(h.getRenderInstance());
-        }
-
+        this.table.getColumn(StockTableHeaders.OPERATION.getCnName()).setCellRenderer(new OperationTableCellRender());
 
         TableRowSorter<DefaultTableModel> rowSorter = new TableRowSorter<>(this);
         Comparator<Object> doubleComparator = (o1, o2) -> {
@@ -83,6 +78,7 @@ public abstract class StockRefreshHandler extends DefaultTableModel {
         };
 
         Arrays.stream(headersForSort)
+                .map(StockTableHeaders::getCnName)
                 .map(header -> ArrayUtils.indexOf(COLUMNS, header))
                 .filter(index -> index >= 0)
                 .forEach(index -> rowSorter.setComparator(index, doubleComparator));
@@ -146,8 +142,8 @@ public abstract class StockRefreshHandler extends DefaultTableModel {
                 return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             }
         };
-        int columnIndex1 = ArrayUtils.indexOf(COLUMNS, StockTableHeaders.STOCK_INCREASING);
-        int columnIndex2 = ArrayUtils.indexOf(COLUMNS, StockTableHeaders.STOCK_INCREASING_PERCENT);
+        int columnIndex1 = ArrayUtils.indexOf(COLUMNS, StockTableHeaders.STOCK_INCREASING.getCnName());
+        int columnIndex2 = ArrayUtils.indexOf(COLUMNS, StockTableHeaders.STOCK_INCREASING_PERCENT.getCnName());
         table.getColumn(getColumnName(columnIndex1)).setCellRenderer(cellRenderer);
         table.getColumn(getColumnName(columnIndex2)).setCellRenderer(cellRenderer);
     }
@@ -217,11 +213,11 @@ public abstract class StockRefreshHandler extends DefaultTableModel {
         }
         // 与columnNames中的元素保持一致
         Vector<Object> v = new Vector<>(COLUMNS.length);
-        for (StockTableHeaders header : COLUMNS) {
-            if (header == StockTableHeaders.OPERATION) {
+        for (String header : COLUMNS) {
+            if (StringUtils.equals(StockTableHeaders.OPERATION.getCnName(), header)) {
                 v.addElement(AllIcons.Welcome.Project.Remove);
             } else {
-                v.addElement(stockBean.getValueByColumn(header, colorful));
+                v.addElement(stockBean.getValueByColumn(header));
             }
         }
         return v;

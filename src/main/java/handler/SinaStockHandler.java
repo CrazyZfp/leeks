@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import bean.StockBean;
 import com.intellij.ui.table.JBTable;
+import org.apache.commons.collections.CollectionUtils;
 import utils.ConfigUtil;
 import utils.HttpClientPool;
 import utils.LogUtil;
@@ -53,6 +54,11 @@ public class SinaStockHandler extends StockRefreshHandler {
     }
 
     private void pollStock(List<String> code) {
+
+        if (CollectionUtils.isEmpty(code)) {
+            return;
+        }
+
         String params = Joiner.on(",").join(code);
         try {
             String res = HttpClientPool.getHttpClient().get(URL + params);

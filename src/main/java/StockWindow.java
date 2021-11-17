@@ -27,6 +27,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.net.MalformedURLException;
+import java.util.Date;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -55,14 +56,13 @@ public class StockWindow {
             @Override
             public void mouseDragged(MouseEvent e) {
 
-                String tableHeadChange = Stream.iterate(0, i -> i + 1)
+                String[] tableHeadChanges = Stream.iterate(0, i -> i + 1)
                         .limit(table.getColumnCount())
-                        .map(table::getColumnName)
-                        .collect(Collectors.joining(","));
+                        .map(table::getColumnName).toArray(String[]::new);
 
                 PropertiesComponent instance = PropertiesComponent.getInstance();
                 //将列名的修改放入环境中 key:stock_table_header_key
-                instance.setValue(WindowUtils.STOCK_TABLE_HEADER_KEY, tableHeadChange);
+                instance.setValues(WindowUtils.STOCK_TABLE_HEADER_KEY, tableHeadChanges);
                 //LogUtil.info(instance.getValue(WindowUtils.STOCK_TABLE_HEADER_KEY));
             }
 
@@ -141,9 +141,14 @@ public class StockWindow {
         };
 
         AnActionButton refreshBtn = new AnActionButton("立即刷新", AllIcons.Actions.Refresh) {
+            private long lastClickTime;
+
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
-                refresh();
+                if (System.currentTimeMillis() - lastClickTime > 2000) {
+                    refresh();
+                    this.lastClickTime = System.currentTimeMillis();
+                }
             }
         };
 
@@ -166,12 +171,12 @@ public class StockWindow {
             handler.stopHandle();
         }
 
-        boolean useSinaApi = PropertiesComponent.getInstance().getBoolean("key_stocks_sina");
+//        boolean useSinaApi = PropertiesComponent.getInstance().getBoolean("key_stocks_sina");
 
-        if (useSinaApi) {
-            return new SinaStockHandler(table, refreshTimeLabel);
-        }
-        return new TencentStockHandler(table, refreshTimeLabel);
+//        if (useSinaApi) {
+        return new SinaStockHandler(table, refreshTimeLabel);
+//        }
+//        return new TencentStockHandler(table, refreshTimeLabel);
     }
 
     public static void apply() {

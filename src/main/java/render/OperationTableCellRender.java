@@ -31,9 +31,8 @@ public class OperationTableCellRender extends DefaultTableCellRenderer {
             @Override
             public void mouseClicked(MouseEvent e) {
 
-                Object code = table.getModel().getValueAt(row, table.getColumn(WindowUtils.StockTableHeaders.STOCK_CODE).getModelIndex());
+                Object code = table.getModel().getValueAt(row, table.getColumn(WindowUtils.StockTableHeaders.STOCK_CODE.getCnName()).getModelIndex());
                 ConfigUtil.removeStocks(String.valueOf(code));
-
                 ((DefaultTableModel) table.getModel()).removeRow(row);
 
                 updateUI();

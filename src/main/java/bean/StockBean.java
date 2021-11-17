@@ -1,10 +1,7 @@
 package bean;
 
-import utils.PinYinUtils;
 import utils.WindowUtils;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 public class StockBean {
@@ -112,16 +109,17 @@ public class StockBean {
     /**
      * 返回列名的VALUE 用作展示
      *
-     * @param header   字段名
-     * @param colorful 隐蔽模式
+     * @param header 字段名
      * @return 对应列名的VALUE值 无法匹配返回""
      */
-    public String getValueByColumn(WindowUtils.StockTableHeaders header, boolean colorful) {
-        switch (header) {
+    public String getValueByColumn(String header) {
+        WindowUtils.StockTableHeaders sth = WindowUtils.StockTableHeaders.of(header);
+
+        switch (sth) {
             case STOCK_CODE:
                 return this.getCode();
             case STOCK_NAME:
-                return colorful ? this.getName() : PinYinUtils.toPinYin(this.getName());
+                return this.getName();
             case STOCK_PRICE:
                 return this.getNow();
             case STOCK_INCREASING:

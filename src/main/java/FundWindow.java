@@ -30,6 +30,7 @@ import java.util.*;
 import java.util.List;
 
 import static constants.Constants.KEY_COLORFUL;
+import static constants.Constants.KEY_FUNDS;
 
 public class FundWindow implements ToolWindowFactory {
     private JPanel mPanel;
@@ -42,22 +43,22 @@ public class FundWindow implements ToolWindowFactory {
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         //先加载代理
-        loadProxySetting();
+//        loadProxySetting();
 
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-        Content content = contentFactory.createContent(mPanel, "Fund", false);
+//        Content content = contentFactory.createContent(mPanel, "Fund", false);
         //股票
         Content content_stock = contentFactory.createContent(stockWindow.getmPanel(), "Stock", false);
         //虚拟货币
-        Content content_coin = contentFactory.createContent(coinWindow.getmPanel(), "Coin", false);
+//        Content content_coin = contentFactory.createContent(coinWindow.getmPanel(), "Coin", false);
         ContentManager contentManager = toolWindow.getContentManager();
-        contentManager.addContent(content);
+//        contentManager.addContent(content);
         contentManager.addContent(content_stock);
-        contentManager.addContent(content_coin);
-        if (StringUtils.isEmpty(PropertiesComponent.getInstance().getValue("key_funds"))) {
-            // 没有配置基金数据，选择展示股票
-            contentManager.setSelectedContent(content_stock);
-        }
+//        contentManager.addContent(content_coin);
+//        if (StringUtils.isEmpty(PropertiesComponent.getInstance().getValue(KEY_FUNDS))) {
+        // 没有配置基金数据，选择展示股票
+        contentManager.setSelectedContent(content_stock);
+//        }
         LogUtil.setProject(project);
 //        ((ToolWindowManagerEx) ToolWindowManager.getInstance(project)).addToolWindowManagerListener(new ToolWindowManagerListener() {
 //            @Override
@@ -77,94 +78,93 @@ public class FundWindow implements ToolWindowFactory {
     @Override
     public void init(ToolWindow window) {
         // 重要：由于idea项目窗口可多个，导致FundWindow#init方法被多次调用，出现UI和逻辑错误(bug #53)，故加此判断解决
-        if (Objects.nonNull(fundRefreshHandler)) {
-            LogUtil.info("Leeks UI已初始化");
-            return;
-        }
-
-        JLabel refreshTimeLabel = new JLabel();
-        refreshTimeLabel.setToolTipText("最后刷新时间");
-        refreshTimeLabel.setBorder(new EmptyBorder(0, 0, 0, 5));
-        JBTable table = new JBTable();
-        //记录列名的变化
-        table.getTableHeader().addMouseMotionListener(new MouseMotionAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                StringBuilder tableHeadChange = new StringBuilder();
-                for (int i = 0; i < table.getColumnCount(); i++) {
-                    tableHeadChange.append(table.getColumnName(i)).append(",");
-                }
-                PropertiesComponent instance = PropertiesComponent.getInstance();
-                //将列名的修改放入环境中 key:fund_table_header_key
-                instance.setValue(WindowUtils.FUND_TABLE_HEADER_KEY, tableHeadChange
-                        .substring(0, tableHeadChange.length() > 0 ? tableHeadChange.length() - 1 : 0));
-
-                //LogUtil.info(instance.getValue(WindowUtils.FUND_TABLE_HEADER_KEY));
-            }
-
-        });
-        table.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (table.getSelectedRow() < 0)
-                    return;
-                String code = String.valueOf(table.getModel().getValueAt(table.convertRowIndexToModel(table.getSelectedRow()), fundRefreshHandler.codeColumnIndex));//FIX 移动列导致的BUG
-                if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() > 1) {
-                    // 鼠标左键双击
-                    try {
-                        PopupsUiUtil.showImageByFundCode(code, PopupsUiUtil.FundShowType.gsz, new Point(e.getXOnScreen(), e.getYOnScreen()));
-                    } catch (MalformedURLException ex) {
-                        ex.printStackTrace();
-                        LogUtil.info(ex.getMessage());
-                    }
-                } else if (SwingUtilities.isRightMouseButton(e)) {
-                    //鼠标右键
-                    JBPopupFactory.getInstance().createListPopup(new BaseListPopupStep<PopupsUiUtil.FundShowType>("",
-                            PopupsUiUtil.FundShowType.values()) {
-                        @Override
-                        public @NotNull String getTextFor(PopupsUiUtil.FundShowType value) {
-                            return value.getDesc();
-                        }
-
-                        @Override
-                        public @Nullable PopupStep onChosen(PopupsUiUtil.FundShowType selectedValue, boolean finalChoice) {
-                            try {
-                                PopupsUiUtil.showImageByFundCode(code, selectedValue, new Point(e.getXOnScreen(), e.getYOnScreen()));
-                            } catch (MalformedURLException ex) {
-                                ex.printStackTrace();
-                                LogUtil.info(ex.getMessage());
-                            }
-                            return super.onChosen(selectedValue, finalChoice);
-                        }
-                    }).show(RelativePoint.fromScreen(new Point(e.getXOnScreen(), e.getYOnScreen())));
-                }
-            }
-        });
-        fundRefreshHandler = new TianTianFundHandler(table, refreshTimeLabel);
-        AnActionButton refreshAction = new AnActionButton("停止刷新当前表格数据", AllIcons.Actions.Pause) {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                fundRefreshHandler.stopHandle();
-                this.setEnabled(false);
-            }
-        };
-        ToolbarDecorator toolbarDecorator = ToolbarDecorator.createDecorator(table)
-                .addExtraAction(new AnActionButton("持续刷新当前表格数据", AllIcons.Actions.Refresh) {
-                    @Override
-                    public void actionPerformed(@NotNull AnActionEvent e) {
-                        refresh();
-                        refreshAction.setEnabled(true);
-                    }
-                })
-                .addExtraAction(refreshAction)
-                .setToolbarPosition(ActionToolbarPosition.TOP);
-        JPanel toolPanel = toolbarDecorator.createPanel();
-        toolbarDecorator.getActionsPanel().add(refreshTimeLabel, BorderLayout.EAST);
-        toolPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
-        mPanel.add(toolPanel, BorderLayout.CENTER);
-        apply();
+//        if (Objects.nonNull(fundRefreshHandler)) {
+//            LogUtil.info("Leeks UI已初始化");
+//            return;
+//        }
+//
+//        JLabel refreshTimeLabel = new JLabel();
+//        refreshTimeLabel.setToolTipText("最后刷新时间");
+//        refreshTimeLabel.setBorder(new EmptyBorder(0, 0, 0, 5));
+//        JBTable table = new JBTable();
+//        //记录列名的变化
+//        table.getTableHeader().addMouseMotionListener(new MouseMotionAdapter() {
+//            @Override
+//            public void mouseDragged(MouseEvent e) {
+//                StringBuilder tableHeadChange = new StringBuilder();
+//                for (int i = 0; i < table.getColumnCount(); i++) {
+//                    tableHeadChange.append(table.getColumnName(i)).append(",");
+//                }
+//                PropertiesComponent instance = PropertiesComponent.getInstance();
+//                //将列名的修改放入环境中 key:fund_table_header_key
+//                instance.setValue(WindowUtils.FUND_TABLE_HEADER_KEY, tableHeadChange
+//                        .substring(0, tableHeadChange.length() > 0 ? tableHeadChange.length() - 1 : 0));
+//
+//                //LogUtil.info(instance.getValue(WindowUtils.FUND_TABLE_HEADER_KEY));
+//            }
+//
+//        });
+//        table.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mousePressed(MouseEvent e) {
+//                if (table.getSelectedRow() < 0)
+//                    return;
+//                String code = String.valueOf(table.getModel().getValueAt(table.convertRowIndexToModel(table.getSelectedRow()), fundRefreshHandler.codeColumnIndex));//FIX 移动列导致的BUG
+//                if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() > 1) {
+//                    // 鼠标左键双击
+//                    try {
+//                        PopupsUiUtil.showImageByFundCode(code, PopupsUiUtil.FundShowType.gsz, new Point(e.getXOnScreen(), e.getYOnScreen()));
+//                    } catch (MalformedURLException ex) {
+//                        ex.printStackTrace();
+//                        LogUtil.info(ex.getMessage());
+//                    }
+//                } else if (SwingUtilities.isRightMouseButton(e)) {
+//                    //鼠标右键
+//                    JBPopupFactory.getInstance().createListPopup(new BaseListPopupStep<PopupsUiUtil.FundShowType>("",
+//                            PopupsUiUtil.FundShowType.values()) {
+//                        @Override
+//                        public @NotNull String getTextFor(PopupsUiUtil.FundShowType value) {
+//                            return value.getDesc();
+//                        }
+//
+//                        @Override
+//                        public @Nullable PopupStep onChosen(PopupsUiUtil.FundShowType selectedValue, boolean finalChoice) {
+//                            try {
+//                                PopupsUiUtil.showImageByFundCode(code, selectedValue, new Point(e.getXOnScreen(), e.getYOnScreen()));
+//                            } catch (MalformedURLException ex) {
+//                                ex.printStackTrace();
+//                                LogUtil.info(ex.getMessage());
+//                            }
+//                            return super.onChosen(selectedValue, finalChoice);
+//                        }
+//                    }).show(RelativePoint.fromScreen(new Point(e.getXOnScreen(), e.getYOnScreen())));
+//                }
+//            }
+//        });
+//        fundRefreshHandler = new TianTianFundHandler(table, refreshTimeLabel);
+//        AnActionButton refreshAction = new AnActionButton("停止刷新当前表格数据", AllIcons.Actions.Pause) {
+//            @Override
+//            public void actionPerformed(@NotNull AnActionEvent e) {
+//                fundRefreshHandler.stopHandle();
+//                this.setEnabled(false);
+//            }
+//        };
+//        ToolbarDecorator toolbarDecorator = ToolbarDecorator.createDecorator(table)
+//                .addExtraAction(new AnActionButton("持续刷新当前表格数据", AllIcons.Actions.Refresh) {
+//                    @Override
+//                    public void actionPerformed(@NotNull AnActionEvent e) {
+//                        refresh();
+//                        refreshAction.setEnabled(true);
+//                    }
+//                })
+//                .addExtraAction(refreshAction)
+//                .setToolbarPosition(ActionToolbarPosition.TOP);
+//        JPanel toolPanel = toolbarDecorator.createPanel();
+//        toolbarDecorator.getActionsPanel().add(refreshTimeLabel, BorderLayout.EAST);
+//        toolPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
+//        mPanel.add(toolPanel, BorderLayout.CENTER);
+//        apply();
     }
-
 
 
     @Override

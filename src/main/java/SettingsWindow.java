@@ -11,7 +11,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import static constants.Constants.KEY_STOCKS;
+import static constants.Constants.*;
 
 public class SettingsWindow implements Configurable {
     private JPanel panel1;
@@ -41,9 +41,9 @@ public class SettingsWindow implements Configurable {
     @Override
     public @Nullable JComponent createComponent() {
         PropertiesComponent instance = PropertiesComponent.getInstance();
-        String value = instance.getValue("key_funds");
+        String value = instance.getValue(KEY_FUNDS);
         String value_stock = instance.getValue(KEY_STOCKS);
-        String value_coin = instance.getValue("key_coins");
+        String value_coin = instance.getValue(KEY_COINS);
         boolean value_color = instance.getBoolean("key_colorful");
         textAreaFund.setText(value);
         textAreaStock.setText(value_stock);
@@ -75,9 +75,9 @@ public class SettingsWindow implements Configurable {
     @Override
     public void apply() {
         PropertiesComponent instance = PropertiesComponent.getInstance();
-        instance.setValues("key_funds", textAreaFund.getText().split("[,，]"));
+        instance.setValues(KEY_FUNDS, textAreaFund.getText().split("[,，]"));
         instance.setValues(KEY_STOCKS, textAreaStock.getText().split("[,，]"));
-        instance.setValues("key_coins", textAreaCoin.getText().split("[,，]"));
+        instance.setValues(KEY_COINS, textAreaCoin.getText().split("[,，]"));
         instance.setValue("key_colorful", !checkbox.isSelected());
         instance.setValue("key_funds_thread_time", spinnerFund.getValue().toString());
         instance.setValue("key_stocks_thread_time", spinnerStock.getValue().toString());

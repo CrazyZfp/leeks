@@ -30,33 +30,30 @@ public class TianTianFundHandler extends FundRefreshHandler {
 
     @Override
     public void handle(List<String> code) {
-        if (worker!=null){
+        if (worker != null) {
             worker.interrupt();
         }
         LogUtil.info("Leeks 更新Fund编码数据.");
 
-        if (code.isEmpty()){
+        if (code.isEmpty()) {
             return;
         }
 
-        worker = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (worker!=null && worker.hashCode() == Thread.currentThread().hashCode() && !worker.isInterrupted()){
-                    synchronized (codes){
-                        stepAction();
-                    }
-                    try {
-                        Thread.sleep(threadSleepTime * 1000);
-                    } catch (InterruptedException e) {
-                        LogUtil.info("Leeks 已停止更新Fund编码数据.");
-                        refreshTimeLabel.setText("stop");
-                        return;
-                    }
+        worker = new Thread(() -> {
+            while (worker != null && worker.hashCode() == Thread.currentThread().hashCode() && !worker.isInterrupted()) {
+                synchronized (codes) {
+                    stepAction();
+                }
+                try {
+                    Thread.sleep(threadSleepTime * 1000);
+                } catch (InterruptedException e) {
+                    LogUtil.info("Leeks 已停止更新Fund编码数据.");
+                    refreshTimeLabel.setText("stop");
+                    return;
                 }
             }
         });
-        synchronized (codes){
+        synchronized (codes) {
             codes.clear();
             codes.addAll(code);
         }
@@ -71,29 +68,27 @@ public class TianTianFundHandler extends FundRefreshHandler {
         }
     }
 
-    private void stepAction(){
+    private void stepAction() {
 //        LogUtil.info("Leeks 刷新基金数据.");
         for (String s : codes) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        String result = HttpClientPool.getHttpClient().get("https://fundgz.1234567.com.cn/js/"+s+".js?rt="+System.currentTimeMillis());
-                        String json = result.substring(8,result.length()-2);
-                        if(!json.isEmpty()){
-                            FundBean bean = gson.fromJson(json,FundBean.class);
-                            updateData(bean);
-                        }else {
-                            LogUtil.info("Fund编码:["+s+"]无法获取数据");
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+            new Thread(() -> {
+                try {
+                    String result = HttpClientPool.getHttpClient().get("https://fundgz.1234567.com.cn/js/" + s + ".js?rt=" + System.currentTimeMillis());
+                    String json = result.substring(8, result.length() - 2);
+                    if (!json.isEmpty()) {
+                        FundBean bean = gson.fromJson(json, FundBean.class);
+                        updateData(bean);
+                    } else {
+                        LogUtil.info("Fund编码:[" + s + "]无法获取数据");
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }).start();
         }
         updateUI();
     }
+
     public void updateUI() {
         SwingUtilities.invokeLater(new Runnable() {
             @Override

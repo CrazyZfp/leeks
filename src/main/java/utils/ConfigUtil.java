@@ -7,7 +7,7 @@ import org.apache.commons.lang.StringUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static constants.Constants.KEY_STOCKS;
+import static constants.Constants.*;
 
 public class ConfigUtil {
     private static List<String> getCodes(String key) {
@@ -16,15 +16,15 @@ public class ConfigUtil {
             return new ArrayList<>();
         }
 
-        return Arrays.stream(values).collect(Collectors.toList());
+        return Arrays.stream(values).filter(StringUtils::isNotBlank).collect(Collectors.toList());
     }
 
     public static List<String> loadCoins() {
-        return ConfigUtil.getCodes("key_coins");
+        return ConfigUtil.getCodes(KEY_COINS);
     }
 
     public static List<String> loadFunds() {
-        return ConfigUtil.getCodes("key_funds");
+        return ConfigUtil.getCodes(KEY_FUNDS);
     }
 
     public static List<String> loadStocks() {

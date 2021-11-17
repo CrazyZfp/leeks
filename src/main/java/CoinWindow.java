@@ -33,56 +33,56 @@ public class CoinWindow {
     }
 
     static {
-        refreshTimeLabel = new JLabel();
-        refreshTimeLabel.setToolTipText("最后刷新时间");
-        refreshTimeLabel.setBorder(new EmptyBorder(0, 0, 0, 5));
-        table = new JBTable();
-        //记录列名的变化
-        table.getTableHeader().addMouseMotionListener(new MouseMotionAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                StringBuilder tableHeadChange = new StringBuilder();
-                for (int i = 0; i < table.getColumnCount(); i++) {
-                    tableHeadChange.append(table.getColumnName(i)).append(",");
-                }
-                PropertiesComponent instance = PropertiesComponent.getInstance();
-                //将列名的修改放入环境中 key:coin_table_header_key
-                instance.setValue(WindowUtils.COIN_TABLE_HEADER_KEY, tableHeadChange
-                        .substring(0, tableHeadChange.length() > 0 ? tableHeadChange.length() - 1 : 0));
-
-                //LogUtil.info(instance.getValue(WindowUtils.COIN_TABLE_HEADER_KEY));
-            }
-        });
+//        refreshTimeLabel = new JLabel();
+//        refreshTimeLabel.setToolTipText("最后刷新时间");
+//        refreshTimeLabel.setBorder(new EmptyBorder(0, 0, 0, 5));
+//        table = new JBTable();
+//        //记录列名的变化
+//        table.getTableHeader().addMouseMotionListener(new MouseMotionAdapter() {
+//            @Override
+//            public void mouseDragged(MouseEvent e) {
+//                StringBuilder tableHeadChange = new StringBuilder();
+//                for (int i = 0; i < table.getColumnCount(); i++) {
+//                    tableHeadChange.append(table.getColumnName(i)).append(",");
+//                }
+//                PropertiesComponent instance = PropertiesComponent.getInstance();
+//                //将列名的修改放入环境中 key:coin_table_header_key
+//                instance.setValue(WindowUtils.COIN_TABLE_HEADER_KEY, tableHeadChange
+//                        .substring(0, tableHeadChange.length() > 0 ? tableHeadChange.length() - 1 : 0));
+//
+//                //LogUtil.info(instance.getValue(WindowUtils.COIN_TABLE_HEADER_KEY));
+//            }
+//        });
     }
 
     public CoinWindow() {
 
         //切换接口
-        handler = new SinaCoinHandler(table,refreshTimeLabel);
-
-        AnActionButton refreshAction = new AnActionButton("停止刷新当前表格数据", AllIcons.Actions.Pause) {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                handler.stopHandle();
-                this.setEnabled(false);
-            }
-        };
-        ToolbarDecorator toolbarDecorator = ToolbarDecorator.createDecorator(table)
-                .addExtraAction(new AnActionButton("持续刷新当前表格数据", AllIcons.Actions.Refresh) {
-                    @Override
-                    public void actionPerformed(@NotNull AnActionEvent e) {
-                        refresh();
-                        refreshAction.setEnabled(true);
-                    }
-                })
-                .addExtraAction(refreshAction)
-                .setToolbarPosition(ActionToolbarPosition.TOP);
-        JPanel toolPanel = toolbarDecorator.createPanel();
-        toolbarDecorator.getActionsPanel().add(refreshTimeLabel, BorderLayout.EAST);
-        toolPanel.setBorder(new EmptyBorder(0,0,0,0));
-        mPanel.add(toolPanel, BorderLayout.CENTER);
-        // 非主要tab，需要创建，创建时立即应用数据
-        apply();
+//        handler = new SinaCoinHandler(table,refreshTimeLabel);
+//
+//        AnActionButton refreshAction = new AnActionButton("停止刷新当前表格数据", AllIcons.Actions.Pause) {
+//            @Override
+//            public void actionPerformed(@NotNull AnActionEvent e) {
+//                handler.stopHandle();
+//                this.setEnabled(false);
+//            }
+//        };
+//        ToolbarDecorator toolbarDecorator = ToolbarDecorator.createDecorator(table)
+//                .addExtraAction(new AnActionButton("持续刷新当前表格数据", AllIcons.Actions.Refresh) {
+//                    @Override
+//                    public void actionPerformed(@NotNull AnActionEvent e) {
+//                        refresh();
+//                        refreshAction.setEnabled(true);
+//                    }
+//                })
+//                .addExtraAction(refreshAction)
+//                .setToolbarPosition(ActionToolbarPosition.TOP);
+//        JPanel toolPanel = toolbarDecorator.createPanel();
+//        toolbarDecorator.getActionsPanel().add(refreshTimeLabel, BorderLayout.EAST);
+//        toolPanel.setBorder(new EmptyBorder(0,0,0,0));
+//        mPanel.add(toolPanel, BorderLayout.CENTER);
+//        // 非主要tab，需要创建，创建时立即应用数据
+//        apply();
     }
 
 
