@@ -19,14 +19,6 @@ public class ConfigUtil {
         return Arrays.stream(values).filter(StringUtils::isNotBlank).collect(Collectors.toList());
     }
 
-    public static List<String> loadCoins() {
-        return ConfigUtil.getCodes(KEY_COINS);
-    }
-
-    public static List<String> loadFunds() {
-        return ConfigUtil.getCodes(KEY_FUNDS);
-    }
-
     public static List<String> loadStocks() {
         return ConfigUtil.getCodes(KEY_STOCKS);
     }
